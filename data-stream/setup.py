@@ -1,5 +1,6 @@
 import logging
-from gqlalchemy import Memgraph, MemgraphKafkaStream
+from gqlalchemy import Memgraph, MemgraphKafkaStream, MemgraphTrigger
+from gqlalchemy.models import TriggerEventType, TriggerEventObject, TriggerExecutionPhase
 from kafka.admin import KafkaAdminClient, NewTopic
 from kafka.errors import TopicAlreadyExistsError, NoBrokersAvailable
 from time import sleep
@@ -58,3 +59,12 @@ def run(memgraph, kafka_ip, kafka_port):
     )
     memgraph.create_stream(stream)
     memgraph.start_stream(stream)
+
+    best_rate_trigger = MemgraphTrigger(
+            name="best_rate",
+            event_type=TriggerEventType.UPDATE,
+            event_object=TriggerEventObject.RELATIONSHIP,
+            execution_phase=TriggerExecutionPhase.AFTER,
+            statement="CALL exchange.best_rate() YIELD best_rate",
+        )
+    memgraph.create_trigger(best_rate_trigger)

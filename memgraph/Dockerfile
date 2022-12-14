@@ -6,3 +6,7 @@ USER root
 COPY query_modules/exchange.py /usr/lib/memgraph/query_modules/exchange.py
 
 USER memgraph
+
+# Install packages
+COPY requirements.txt ./
+RUN pip3 install -r requirements.txt
